@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import pygame
+import math
+import time
 
 # === CONFIG ===
 BOARD_SIZE = 4
@@ -33,6 +35,26 @@ class Square:
             highlight_surf = pygame.Surface((square_w, square_h), pygame.SRCALPHA)
             highlight_surf.fill(HIGHLIGHT_COLOR)
             surface.blit(highlight_surf, rect.topleft)
+
+# === SFONDO IN MOVIMENTO ===
+class Background:
+    def __init__(self, image_path, width, height, speed=1):
+        self.image = pygame.image.load(image_path).convert()
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.width = width
+        self.height = height
+        self.x = 0
+        self.speed = speed
+
+    def update(self):
+        self.x -= self.speed
+        if self.x <= -self.width:
+            self.x = 0
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, 0))
+        screen.blit(self.image, (self.x + self.width, 0))
+
 
 
 # === CREAZIONE SCACCHIERA ===
@@ -94,8 +116,8 @@ def handle_mouse(board, mouse_pos, width, height, board_width_ratio=0.75):
 
 
 # === MENU INIZIALE ===
-def draw_menu(screen, width, height, font, mouse_pos):
-    screen.fill((255, 255, 255))
+def draw_menu(screen, width, height, font, mouse_pos,t):
+    
 
     base_color = (160, 32, 240)
     hover_color = (200, 100, 255)
@@ -115,8 +137,10 @@ def draw_menu(screen, width, height, font, mouse_pos):
 
     for i in range(3):
         rect = pygame.Rect(0, 0, rect_width, rect_height)
-        rect.centerx = center_x
-        rect.y = start_y + i * (rect_height + spacing)
+        rect_x = center_x + 5 * math.sin(t * 2) # per far muovere il rettangolo
+        offset_y = 5 * math.sin(t*1.5 + i)#si usa seno e coseno perche il loro valore si alterna tra 1 e -1 cosi non si rischia che vada via dallo schermo
+        rect.centerx = rect_x
+        rect.y = start_y + i * (rect_height + spacing)+offset_y
 
         # Hover effect
         color = hover_color if rect.collidepoint(mouse_pos) else base_color
@@ -135,7 +159,7 @@ def draw_menu(screen, width, height, font, mouse_pos):
     return rects
 
 def draw_giocatori(screen, width, height, font, mouse_pos):
-    screen.fill((255, 255, 255))
+    
 
     base_color = (160, 32, 240)
     hover_color = (200, 100, 255)
@@ -216,7 +240,7 @@ def draw_giocatori(screen, width, height, font, mouse_pos):
 
 
 def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos):
-    screen.fill((255, 255, 255))
+     
 
     base_color = (160, 32, 240)
     hover_color = (200, 100, 255)
@@ -330,6 +354,10 @@ def main():
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 36)
     font1= pygame.font.SysFont(None, 20)
+    # Inizializza lo sfondo animato
+    background = Background("sfondo1.png", INITIAL_SIZE[0], INITIAL_SIZE[1], speed=1)
+    t = 0  # tempo iniziale per oscillazione
+
 
     board = create_board()
 
@@ -347,6 +375,8 @@ def main():
 
     running = True
     while running:
+        dt = clock.tick(FPS) / 1000  # tempo trascorso in secondi
+        t += dt * 2  # moltiplica per la velocità dell'oscillazione
         width, height = screen.get_size()
         mouse_pos = pygame.mouse.get_pos()
 
@@ -373,24 +403,31 @@ def main():
                             if menu_numero_giocatori.index(rect)>0 and menu_numero_giocatori.index(rect)<5:
                                 giocatori_settati=True
                                 numero_dei_giocatori= menu_numero_giocatori.index(rect)
-                                print(numero_dei_giocatori)
+                                print("numero_dei_giocatori:", numero_dei_giocatori)
                 elif not scelta_ruoli:
                     for rect in menu_scelta_ruoli:
                         if rect.collidepoint(event.pos):
-                            print("hai scelto il ruolo")
-                            scelta_ruoli=True
+                            for i in range(numero_dei_giocatori):
+                                print("hai scelto il ruolo")
+                                if i==numero_dei_giocatori-1:
+                                 scelta_ruoli=True
                             
-
+        # === AGGIORNA E DISEGNA SFONDO SEMPRE ===
+        background.update()
+        background.draw(screen)
 
                     
 
         if show_menu:
             # Mostra menu principale
-            menu_rects = draw_menu(screen, width, height, font, mouse_pos)
+            menu_rects = draw_menu(screen, width, height, font, mouse_pos,t)
+        
         elif not giocatori_settati:
             menu_numero_giocatori= draw_giocatori(screen, width, height, font, mouse_pos)  
+        
         elif not scelta_ruoli:
             menu_scelta_ruoli=draw_scelta_giocatori(screen, width,height, font,font1, mouse_pos)          
+        
         else:
             # Mostra scacchiera + comandi
             handle_mouse(board, mouse_pos, width, height)
