@@ -55,6 +55,24 @@ class Background:
         screen.blit(self.image, (self.x, 0))
         screen.blit(self.image, (self.x + self.width, 0))
 
+class Giocatore:
+    def __init__(self, p_vita, p_vita_max,ruolo,dadi_attacco, dadi_difesa,nome=None, posizione=None):
+        self.p_vita=p_vita
+        self.p_vita_max=p_vita_max
+        self.ruolo=ruolo
+        self.dadi_attacco=dadi_attacco
+        self.dadi_difesa=dadi_difesa
+        self.nome=nome
+        self.posizione=posizione
+   
+    def stampa_valori(self):
+        print(f"Nome: {self.nome or 'Senza nome'}")
+        print(f"Ruolo: {self.ruolo}")
+        print(f"Punti vita: {self.p_vita}/{self.p_vita_max}")
+        print(f"Dadi attacco: {self.dadi_attacco}")
+        print(f"Dadi difesa: {self.dadi_difesa}")
+        print(f"Posizione: {self.posizione}")
+
 
 
 # === CREAZIONE SCACCHIERA ===
@@ -116,12 +134,7 @@ def handle_mouse(board, mouse_pos, width, height, board_width_ratio=0.75):
 
 
 # === MENU INIZIALE ===
-def draw_menu(screen, width, height, font, mouse_pos,t):
-    
-
-    base_color = (160, 32, 240)
-    hover_color = (200, 100, 255)
-    text_color = (255, 255, 255)
+def draw_menu(screen, width, height, font, mouse_pos,t,base_color, hover_color,text_color):
     rect_width = 200
     rect_height = 80
     spacing = 20
@@ -158,12 +171,8 @@ def draw_menu(screen, width, height, font, mouse_pos,t):
 
     return rects
 
-def draw_giocatori(screen, width, height, font, mouse_pos):
+def draw_giocatori(screen, width, height, font, mouse_pos,base_color, hover_color,text_color):
     
-
-    base_color = (160, 32, 240)
-    hover_color = (200, 100, 255)
-    text_color = (255, 255, 255)
     rect_width = 200
     rect_height = 80
     spacing = 20
@@ -239,12 +248,8 @@ def draw_giocatori(screen, width, height, font, mouse_pos):
     return rects
 
 
-def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos):
+def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos,base_color, hover_color,text_color, base_color_rosso, hover_color_rosso,principe_settato):
      
-
-    base_color = (160, 32, 240)
-    hover_color = (200, 100, 255)
-    text_color = (255, 255, 255)
     rect_width = 200
     rect_height = 80
     spacing = 20
@@ -255,15 +260,19 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos):
     total_height = 3 * rect_height + 2 * spacing
     start_y = center_y - total_height // 2
     rects = []
-    texts=["Principe","Punti Vita -> 3", "Punti vita massimi -> 3", "Dadi attacco -> 2", "Dadi difesa -> 1", "Dopplegenger","Punti Vita -> 3", "Punti vita massimi -> 3", "Dadi attacco -> 2", "Dadi difesa -> 1"]
-    for i in range(4):
+    titolo=["Scegliete il ruolo"]
+    texts=["Principe","Punti Vita -> 3", "Punti Vita Massimi -> 3", "Dadi attacco -> 2", "Dadi difesa -> 1", "Dopplegenger","Punti Vita -> 3", "Punti Vita Massimi -> 3", "Dadi attacco -> 2", "Dadi difesa -> 1"]
+    for i in range(5):
         if i == 0:
             rect = pygame.Rect(0, 0, rect_width*1.5, rect_height)
             rect.centerx = center_x
-            rect.y = start_y + i * (rect_height + spacing)
+            rect.y = start_y + i * (rect_height + spacing)+100
 
             # Hover effect
-            color = hover_color if rect.collidepoint(mouse_pos) else base_color
+            if not principe_settato:
+                color = hover_color if rect.collidepoint(mouse_pos) else base_color
+            else:
+                color = hover_color_rosso if rect.collidepoint(mouse_pos) else base_color_rosso
 
             # Rettangolo + bordo
             pygame.draw.rect(screen, color, rect, border_radius=10)
@@ -278,10 +287,13 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos):
         elif i==1:
             rect = pygame.Rect(0, 0, rect_width+75, rect_height*4)
             rect.centerx = center_x
-            rect.y = start_y + i * (rect_height)
+            rect.y = start_y + i * (rect_height)+100
 
             # Hover effect
-            color = hover_color if rect.collidepoint(mouse_pos) else base_color
+            if not principe_settato:
+                color = hover_color if rect.collidepoint(mouse_pos) else base_color
+            else:
+                color = hover_color_rosso if rect.collidepoint(mouse_pos) else base_color_rosso
 
             # Rettangolo + bordo
             pygame.draw.rect(screen, color, rect, border_radius=10)
@@ -301,7 +313,7 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos):
         elif i==2:
             rect = pygame.Rect(0, 0, rect_width*1.5, rect_height)
             rect.centerx = center_x*3
-            rect.y = start_y + 0 * (rect_height + spacing)
+            rect.y = start_y + 0 * (rect_height + spacing)+100
 
             # Hover effect
             color = hover_color if rect.collidepoint(mouse_pos) else base_color
@@ -316,10 +328,10 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos):
             screen.blit(text_surf, text_rect)
 
             rects.append(rect)
-        else:
+        elif i==3:
             rect = pygame.Rect(0, 0, rect_width+75, rect_height*4)
             rect.centerx = center_x*3
-            rect.y = start_y + 1 * (rect_height)
+            rect.y = start_y + 1 * (rect_height)+100
 
             # Hover effect
             color = hover_color if rect.collidepoint(mouse_pos) else base_color
@@ -336,6 +348,25 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos):
                                         rect.y + j * rect_height + (rect_height - text_surf.get_height()) / 2))
 
                 screen.blit(text_surf, text_rect)
+            rects.append(rect)
+        else:
+            rect = pygame.Rect(0, 0, rect_width*3, rect_height)
+            rect.centerx = center_x*2
+            rect.y = start_y + 0 * (rect_height + spacing)
+
+            
+            color = base_color
+
+            # Rettangolo + bordo
+            pygame.draw.rect(screen, color, rect, border_radius=10)
+            pygame.draw.rect(screen, (80, 0, 150), rect, 2, border_radius=10)
+
+            # Testo centrato
+            text_surf = font.render(titolo[0], True, text_color)
+            text_rect = text_surf.get_rect(center=rect.center)
+            screen.blit(text_surf, text_rect)
+
+
 
 
 
@@ -358,6 +389,19 @@ def main():
     background = Background("sfondo1.png", INITIAL_SIZE[0], INITIAL_SIZE[1], speed=1)
     t = 0  # tempo iniziale per oscillazione
 
+    #colori per i rettangoli
+
+    #viola
+    base_color = (160, 32, 240)
+    hover_color = (200, 100, 255)
+
+    #rosso_porpora
+    base_color_rosso=(85,0,0)
+    hover_color_rosso=(115,56,66)
+
+    text_color = (255, 255, 255)
+
+
 
     board = create_board()
 
@@ -365,12 +409,22 @@ def main():
     show_menu = True
     menu_rects = []
 
+    #scegliere in quanti si gioca
     giocatori_settati=False
     menu_numero_giocatori=[]
     numero_dei_giocatori= None
+    numero_dei_giocatori_per_settare=None
 
+    #scegliere i ruoli dei giocatori
+    principe_settato=False
     scelta_ruoli=False
     menu_scelta_ruoli=[]
+    lista_contenente_i_giocatori=[]
+
+    #indici necessari
+    indice_per_stampare_i_giocatori=0
+
+
 
 
     running = True
@@ -403,15 +457,44 @@ def main():
                             if menu_numero_giocatori.index(rect)>0 and menu_numero_giocatori.index(rect)<5:
                                 giocatori_settati=True
                                 numero_dei_giocatori= menu_numero_giocatori.index(rect)
+                                numero_dei_giocatori_per_settare=menu_numero_giocatori.index(rect)
                                 print("numero_dei_giocatori:", numero_dei_giocatori)
                 elif not scelta_ruoli:
                     for rect in menu_scelta_ruoli:
                         if rect.collidepoint(event.pos):
-                            for i in range(numero_dei_giocatori):
-                                print("hai scelto il ruolo")
-                                if i==numero_dei_giocatori-1:
-                                 scelta_ruoli=True
+                            print("hai scelto il ruolo")
+                                 
+                            if not principe_settato:
+
+                                if menu_scelta_ruoli.index(rect)<=1:
+                                    lista_contenente_i_giocatori.append(Giocatore(3,3,"Principe", 2,1))
+                                    lista_contenente_i_giocatori[indice_per_stampare_i_giocatori].stampa_valori()
+                                    indice_per_stampare_i_giocatori+=1
+                                    principe_settato=True
+                                    numero_dei_giocatori_per_settare -= 1
+                                elif menu_scelta_ruoli.index(rect)>1 and menu_scelta_ruoli.index(rect)<=3 :
+                                    lista_contenente_i_giocatori.append(Giocatore(3,3,"Dopplegenger"+f"{indice_per_stampare_i_giocatori}",2,1))
+                                    lista_contenente_i_giocatori[indice_per_stampare_i_giocatori].stampa_valori()
+                                    indice_per_stampare_i_giocatori+=1
+                                    numero_dei_giocatori_per_settare -= 1
+
+                            elif menu_scelta_ruoli.index(rect)>1 and menu_scelta_ruoli.index(rect)<=3 :
+                                lista_contenente_i_giocatori.append(Giocatore(3,3,"Dopplegenger"+f"{indice_per_stampare_i_giocatori}",2,1))
+                                lista_contenente_i_giocatori[indice_per_stampare_i_giocatori].stampa_valori()
+                                indice_per_stampare_i_giocatori+=1
+                                numero_dei_giocatori_per_settare -= 1
                             
+
+                            if numero_dei_giocatori_per_settare <= 0:
+                                if principe_settato:
+                                    scelta_ruoli = True
+                                else:
+                                    numero_dei_giocatori_per_settare=numero_dei_giocatori
+                                    lista_contenente_i_giocatori.clear()
+                                    indice_per_stampare_i_giocatori=0
+
+
+                                       
         # === AGGIORNA E DISEGNA SFONDO SEMPRE ===
         background.update()
         background.draw(screen)
@@ -420,13 +503,14 @@ def main():
 
         if show_menu:
             # Mostra menu principale
-            menu_rects = draw_menu(screen, width, height, font, mouse_pos,t)
+            menu_rects = draw_menu(screen, width, height, font, mouse_pos,t, base_color, hover_color,text_color)
         
         elif not giocatori_settati:
-            menu_numero_giocatori= draw_giocatori(screen, width, height, font, mouse_pos)  
+            menu_numero_giocatori= draw_giocatori(screen, width, height, font, mouse_pos,base_color, hover_color,text_color)  
         
         elif not scelta_ruoli:
-            menu_scelta_ruoli=draw_scelta_giocatori(screen, width,height, font,font1, mouse_pos)          
+            menu_scelta_ruoli=draw_scelta_giocatori(screen,width,height, font,font1, mouse_pos,base_color, hover_color,text_color, base_color_rosso,hover_color_rosso,principe_settato)
+                     
         
         else:
             # Mostra scacchiera + comandi
