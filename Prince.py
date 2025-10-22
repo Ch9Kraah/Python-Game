@@ -248,7 +248,7 @@ def draw_giocatori(screen, width, height, font, mouse_pos,base_color, hover_colo
     return rects
 
 
-def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos,base_color, hover_color,text_color, base_color_rosso, hover_color_rosso,principe_settato):
+def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos,base_color, hover_color,text_color, base_color_rosso, hover_color_rosso,principe_settato,t):
      
     rect_width = 200
     rect_height = 80
@@ -312,8 +312,17 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos,base_colo
             rects.append(rect)
         elif i==2:
             rect = pygame.Rect(0, 0, rect_width*1.5, rect_height)
-            rect.centerx = center_x*3
-            rect.y = start_y + 0 * (rect_height + spacing)+100
+            
+            if principe_settato:
+                rect.centerx = center_x*3+5 * math.sin(t * 2)
+            else:
+                rect.centerx = center_x*3
+
+            if principe_settato:
+                offset_y = 5 * math.sin(t*1.5 + i)#si usa seno e coseno perche il loro valore si alterna tra 1 e -1 cosi non si rischia che vada via dallo schermo
+                rect.y = start_y + 0 * (rect_height + spacing)+100+offset_y
+            else:
+                rect.y = start_y + 0 * (rect_height + spacing)+100
 
             # Hover effect
             color = hover_color if rect.collidepoint(mouse_pos) else base_color
@@ -330,8 +339,16 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos,base_colo
             rects.append(rect)
         elif i==3:
             rect = pygame.Rect(0, 0, rect_width+75, rect_height*4)
-            rect.centerx = center_x*3
-            rect.y = start_y + 1 * (rect_height)+100
+           
+            if principe_settato:
+                rect.centerx = center_x*3+5 * math.sin(t * 2)
+            else:
+                rect.centerx = center_x*3
+           
+            if principe_settato:
+                rect.y = start_y + 1 * (rect_height)+100+offset_y
+            else:
+                rect.y = start_y + 1 * (rect_height)+100
 
             # Hover effect
             color = hover_color if rect.collidepoint(mouse_pos) else base_color
@@ -509,7 +526,7 @@ def main():
             menu_numero_giocatori= draw_giocatori(screen, width, height, font, mouse_pos,base_color, hover_color,text_color)  
         
         elif not scelta_ruoli:
-            menu_scelta_ruoli=draw_scelta_giocatori(screen,width,height, font,font1, mouse_pos,base_color, hover_color,text_color, base_color_rosso,hover_color_rosso,principe_settato)
+            menu_scelta_ruoli=draw_scelta_giocatori(screen,width,height, font,font1, mouse_pos,base_color, hover_color,text_color, base_color_rosso,hover_color_rosso,principe_settato,t)
                      
         
         else:
