@@ -397,6 +397,9 @@ def draw_scelta_giocatori(screen, width, height, font,font1, mouse_pos,base_colo
 # === MAIN LOOP ===
 def main():
     pygame.init()
+    pygame.mixer.init()
+    pygame.mixer.music.load("puerco.mp3")
+    pygame.mixer.music.play(-1,0.0)
     screen = pygame.display.set_mode(INITIAL_SIZE, pygame.RESIZABLE)
     pygame.display.set_caption(WINDOW_TITLE)
     clock = pygame.time.Clock()
